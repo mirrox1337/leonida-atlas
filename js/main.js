@@ -497,7 +497,21 @@ function applyHash() {
 
 /* ---------- start-up ---------- */
 
+function initWelcome() {
+  const welcome = document.getElementById('welcome');
+  if (!welcome) return;
+  document.getElementById('welcome-count').textContent = app.markers.length.toLocaleString('en');
+  const close = () => {
+    document.documentElement.classList.add('welcomed');
+    storage.save('welcomed', true);
+  };
+  document.getElementById('welcome-close').addEventListener('click', close);
+  welcome.addEventListener('click', (event) => { if (event.target === welcome) close(); });
+  document.addEventListener('keydown', (event) => { if (event.key === 'Escape') close(); });
+}
+
 function showFatal(error) {
+  document.getElementById('loading')?.remove();
   document.body.append(el('div', { class: 'fatal', role: 'alert' },
     el('strong', { text: 'The map could not start.' }),
     el('p', { text: String(error.message || error) }),
@@ -554,6 +568,8 @@ async function start() {
     storageAvailable: storage.available(),
   });
   app.sidebar = initSidebar(app);
+  document.getElementById('loading')?.remove();
+  initWelcome();
 
   applyHash();
   declutterLabels();

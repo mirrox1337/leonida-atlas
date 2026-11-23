@@ -18,7 +18,9 @@ export function initSidebar(app) {
     panel.classList.toggle('is-open', open);
     handle.setAttribute('aria-expanded', String(open));
   };
-  handle.addEventListener('click', () => setDrawer(!panel.classList.contains('is-open')));
+  const toggleDrawer = () => setDrawer(!panel.classList.contains('is-open'));
+  handle.addEventListener('click', toggleDrawer);
+  document.getElementById('drawer-open').addEventListener('click', toggleDrawer);
   app.map.on('click', () => setDrawer(false));
 
   // Swipe the top of the drawer up to open it and down to close it.

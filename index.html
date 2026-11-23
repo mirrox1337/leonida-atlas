@@ -3,11 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Leonida Atlas · unofficial GTA 6 fan map</title>
-  <meta name="description" content="Unofficial, fan-made interactive map of Leonida with filterable markers, search and progress tracking.">
+  <title>GTA 6 Interactive Map · Leonida Atlas</title>
+  <meta name="description" content="Free fan-made GTA 6 interactive map of Leonida: stunt jumps, collectibles, ATMs, shops, vehicles and places. Search, filter, zoom to single buildings and tick off what you find.">
+  <link rel="canonical" href="https://mirrox1337.github.io/leonida-atlas/">
   <meta name="theme-color" content="#0c1418">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Leonida Atlas · unofficial GTA 6 fan map">
+  <meta property="og:title" content="GTA 6 Interactive Map · Leonida Atlas">
+  <meta property="og:url" content="https://mirrox1337.github.io/leonida-atlas/">
+  <meta property="og:image" content="https://mirrox1337.github.io/leonida-atlas/assets/social.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
   <meta property="og:description" content="Fan-made interactive map of Leonida: stunt jumps, collectibles, shops, ATMs and places, with search and progress tracking.">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/icons/icon-180.png">
@@ -17,6 +23,26 @@
   <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
   <link rel="stylesheet" href="vendor/leaflet.markercluster/MarkerCluster.css">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="modulepreload" href="js/main.js">
+  <link rel="modulepreload" href="js/config.js">
+  <link rel="modulepreload" href="js/map.js">
+  <link rel="modulepreload" href="js/storage.js">
+  <link rel="modulepreload" href="js/icons.js">
+  <link rel="modulepreload" href="js/hash.js">
+  <link rel="modulepreload" href="js/sidebar.js">
+  <link rel="modulepreload" href="js/util.js">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebApplication","name":"Leonida Atlas","url":"https://mirrox1337.github.io/leonida-atlas/","applicationCategory":"GameApplication","operatingSystem":"Any","description":"Free fan-made interactive map of Leonida, the setting of GTA 6, with searchable markers and progress tracking.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+  </script>
+  <script>
+    // Skip the welcome card for returning visitors and for shared marker links,
+    // before the page paints.
+    try {
+      if (localStorage.getItem('leonida-atlas:welcomed') || /[#&]m=/.test(location.hash) || /[?&]edit=1/.test(location.search)) {
+        document.documentElement.classList.add('welcomed');
+      }
+    } catch (e) { /* storage blocked: the card simply shows */ }
+  </script>
 </head>
 <body>
   <div id="map" aria-label="Interactive map of Leonida"></div>
@@ -36,8 +62,11 @@
     </header>
 
     <div class="search">
+      <div class="search__field">
       <input id="search" type="text" inputmode="search" enterkeyhint="search" placeholder="Search markers" autocomplete="off" spellcheck="false" aria-label="Search markers" aria-controls="results">
       <button id="search-clear" class="search__clear" type="button" aria-label="Clear search" hidden>×</button>
+      </div>
+      <button id="drawer-open" class="search__filters" type="button" aria-controls="panel-body">Filters</button>
     </div>
     <ul id="results" class="results" hidden></ul>
 
@@ -76,6 +105,22 @@
       </section>
     </div>
   </aside>
+
+  <div id="loading" class="loading" role="status">Loading map…</div>
+
+  <div id="welcome" class="welcome" role="dialog" aria-modal="true" aria-labelledby="welcome-title">
+    <div class="welcome__card">
+      <svg class="welcome__mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3 20 16 16 29 12 16z" fill="#f2b84b"/><path d="M3 16 16 13 29 16 16 19z" fill="#3fd0c0"/></svg>
+      <h2 id="welcome-title" class="welcome__title">GTA 6 interactive map</h2>
+      <p class="welcome__lead">Leonida Atlas is a free, fan-made map of Leonida with <span id="welcome-count">nearly 2,000</span> markers: stunt jumps, collectibles, ATMs, shops, vehicles and places.</p>
+      <ul class="welcome__list">
+        <li><strong>Filter</strong> Switch categories on and off in the list.</li>
+        <li><strong>Search</strong> Find any marker by name and jump to it.</li>
+        <li><strong>Track</strong> Tick off what you find. It is saved on this device.</li>
+      </ul>
+      <button id="welcome-close" class="btn btn--accent welcome__go" type="button">Explore the map</button>
+    </div>
+  </div>
 
   <div id="coords" class="coords" hidden>x · y</div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>

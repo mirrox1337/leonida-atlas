@@ -2,6 +2,8 @@
 
 **Live map: <https://mirrox1337.github.io/leonida-atlas/>**
 
+[![Leonida Atlas: GTA 6 interactive map](assets/social.jpg)](https://mirrox1337.github.io/leonida-atlas/)
+
 An unofficial, fan-made interactive map for GTA 6 (the state of Leonida): a
 pannable, zoomable map with categorized markers, filters, search, progress
 tracking and shareable links.
@@ -288,6 +290,9 @@ label that sits off its place.
 - **Dark map**: the moon button under the zoom buttons darkens the map with a
   CSS filter (`--night` in `css/style.css`); no second set of tiles is needed.
   It is off by default and the visitor's choice is remembered.
+- **Welcome card**: first-time visitors get a short introduction (skipped for
+  shared marker links). The text lives in `index.html`, so search engines can
+  read it.
 - **Sidebar groups** collapse and show a found/total count; they start
   collapsed on phones.
 - **Home button** (under the dark-map button) shows the whole map again.

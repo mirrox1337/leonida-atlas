@@ -1,5 +1,7 @@
 # Leonida Atlas
 
+**Live map: <https://mirrox1337.github.io/leonida-atlas/>**
+
 An unofficial, fan-made interactive map for GTA 6 (the state of Leonida): a
 pannable, zoomable map with categorized markers, filters, search, progress
 tracking and shareable links.

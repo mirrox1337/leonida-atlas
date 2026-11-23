@@ -38,7 +38,7 @@
     // Skip the welcome card for returning visitors and for shared marker links,
     // before the page paints.
     try {
-      if (localStorage.getItem('leonida-atlas:welcomed') || /[#&]m=/.test(location.hash) || /[?&]edit=1/.test(location.search)) {
+      if (localStorage.getItem('leonida-atlas:welcomed') || /[#&][mr]=/.test(location.hash) || /[?&]edit=1/.test(location.search)) {
         document.documentElement.classList.add('welcomed');
       }
     } catch (e) { /* storage blocked: the card simply shows */ }

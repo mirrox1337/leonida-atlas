@@ -55,6 +55,10 @@ export function createMap(element, { editMode = false } = {}) {
   map.createPane('regions');
   map.getPane('regions').style.zIndex = 450;
   map.getPane('regions').style.pointerEvents = 'none';
+  // The selected place label is lifted above the pins so it is never covered.
+  map.createPane('regionTop');
+  map.getPane('regionTop').style.zIndex = 650;
+  map.getPane('regionTop').style.pointerEvents = 'none';
 
   if (CONFIG.map.mode === 'tiles') {
     L.tileLayer(CONFIG.map.tiles.url, {

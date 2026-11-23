@@ -35,6 +35,7 @@ const app = {
   hidden: new Set(), // hidden category ids
   hideFound: false,
   showRegions: true,
+  selectedRegion: null, // id of the highlighted place label
   darkMap: false,
   collapsed: new Set(), // collapsed sidebar group names
   query: '',
@@ -172,6 +173,7 @@ function createLayers() {
     layer.bindPopup(() => buildPopup(marker), popupOptions());
     layer.on('popupopen', () => {
       app.selectedId = marker.id;
+      if (app.selectedRegion) selectRegion(null);
       syncHash();
     });
     layer.on('popupclose', () => {
@@ -200,10 +202,15 @@ function createRegions(regions) {
     .map((region) => ({ ...region, kind: kinds.includes(region.kind) ? region.kind : 'region' }))
     .sort((a, b) => kinds.indexOf(a.kind) - kinds.indexOf(b.kind))
     .map((region) => ({
+      id: String(region.id ?? region.name),
+      name: region.name || String(region.id),
+      kind: region.kind,
+      x: region.x,
+      y: region.y,
       minZoom: focusZoom + LABEL_KINDS[region.kind],
       marker: L.marker(toLatLng(region.x, region.y), {
         pane: 'regions',
-        interactive: false,
+        interactive: true,
         keyboard: false,
         icon: L.divIcon({
           className: 'region-icon',
@@ -212,18 +219,62 @@ function createRegions(regions) {
         }),
       }).addTo(app.regionLayer),
     }));
+  for (const region of app.regionLabels) {
+    region.marker.on('click', () => selectRegion(region.id));
+  }
   app.map.on('zoomend', declutterLabels);
+  app.map.on('click', () => selectRegion(null));
   if (app.showRegions) app.regionLayer.addTo(app.map);
+}
+
+// How far to zoom when a place is selected, relative to focusZoom.
+const REGION_ZOOM = { county: -3, city: -2, region: -2.5, town: -1.5, area: -0.5, water: -2.5 };
+
+/** Highlights a place label and flies to it. Pass null to clear the selection. */
+function selectRegion(id, { fly = true } = {}) {
+  const region = id == null ? null : app.regionLabels.find((r) => r.id === id);
+  if (id != null && !region) {
+    toast('That place is not on the map any more');
+    return false;
+  }
+  if (app.selectedRegion === (region ? region.id : null)) {
+    if (!region) return true;
+  }
+  app.selectedRegion = region ? region.id : null;
+  // Move labels between the normal pane and the one above the pins.
+  for (const r of app.regionLabels) {
+    const pane = r === region ? 'regionTop' : 'regions';
+    if (r.marker.options.pane === pane) continue;
+    app.regionLayer.removeLayer(r.marker);
+    r.marker.options.pane = pane;
+    app.regionLayer.addLayer(r.marker);
+  }
+  if (region) {
+    app.map.closePopup();
+    if (!app.showRegions) app.sidebar?.setRegions(true);
+    if (fly) {
+      const zoom = focusZoom + REGION_ZOOM[region.kind];
+      const target = toLatLng(region.x, region.y);
+      if (reduceMotion.matches) app.map.setView(target, zoom, { animate: false });
+      else app.map.flyTo(target, zoom, { duration: 0.8 });
+    }
+  }
+  declutterLabels();
+  syncHash();
+  return true;
 }
 
 function declutterLabels() {
   if (!app.map.hasLayer(app.regionLayer)) return;
   const zoom = app.map.getZoom();
   const placed = [];
-  for (const { marker, minZoom } of app.regionLabels) {
+  // The selected place always shows and gets first pick of the space.
+  const ordered = [...app.regionLabels].sort((a, b) => (b.id === app.selectedRegion) - (a.id === app.selectedRegion));
+  for (const { id, marker, minZoom } of ordered) {
     const label = marker.getElement()?.firstElementChild;
     if (!label) continue;
-    let show = zoom >= minZoom;
+    label.classList.toggle('is-selected', id === app.selectedRegion);
+    let show = zoom >= minZoom || id === app.selectedRegion;
     if (show) {
       const box = label.getBoundingClientRect();
       show = !placed.some((other) => box.left < other.right + 6 && box.right > other.left - 6
@@ -299,6 +350,7 @@ function setHideFound(value) {
 
 function setShowRegions(value) {
   app.showRegions = value;
+  if (!value) selectRegion(null);
   if (value) app.regionLayer.addTo(app.map);
   else app.regionLayer.remove();
   declutterLabels();
@@ -369,6 +421,7 @@ function viewState() {
   const centre = toPixel(app.map.getCenter());
   return {
     m: app.selectedId,
+    r: app.selectedRegion,
     x: centre.x,
     y: centre.y,
     z: Math.round(app.map.getZoom() * 100) / 100,
@@ -493,6 +546,7 @@ function applyHash() {
   if (hasView) app.map.setView(toLatLng(hash.x, hash.y), hash.z, { animate: false });
   else if (!app.map._loaded) homeView();
   if (hash.m && hash.m !== app.selectedId) select(hash.m, { fly: !hasView });
+  else if (!hash.m && hash.r && hash.r !== app.selectedRegion) selectRegion(hash.r, { fly: !hasView });
 }
 
 /* ---------- start-up ---------- */
@@ -564,7 +618,7 @@ async function start() {
 
   Object.assign(app, {
     makeIcon, popupOptions, counts, select, setCategoriesVisible, setHideFound,
-    setShowRegions, setQuery, resetFound, matchesQuery, setDarkMap, setGroupCollapsed,
+    setShowRegions, setQuery, resetFound, matchesQuery, setDarkMap, setGroupCollapsed, selectRegion,
     storageAvailable: storage.available(),
   });
   app.sidebar = initSidebar(app);

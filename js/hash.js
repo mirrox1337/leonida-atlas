@@ -1,5 +1,6 @@
 // Deep links. The URL hash looks like  #m=marker-id&x=2100&y=2500&z=3
 // where x/y is the map centre in source-image pixels and z is the zoom.
+// A selected place uses r=region-id instead of m=.
 
 export function parseHash(hash = window.location.hash) {
   const params = new URLSearchParams(hash.replace(/^#/, ''));
@@ -7,12 +8,13 @@ export function parseHash(hash = window.location.hash) {
     const value = Number.parseFloat(params.get(key));
     return Number.isFinite(value) ? value : null;
   };
-  return { m: params.get('m') || null, x: num('x'), y: num('y'), z: num('z') };
+  return { m: params.get('m') || null, r: params.get('r') || null, x: num('x'), y: num('y'), z: num('z') };
 }
 
-export function buildHash({ m, x, y, z }) {
+export function buildHash({ m, r, x, y, z }) {
   const parts = [];
   if (m) parts.push(`m=${encodeURIComponent(m)}`);
+  else if (r) parts.push(`r=${encodeURIComponent(r)}`);
   if (x != null && y != null && z != null) parts.push(`x=${x}`, `y=${y}`, `z=${z}`);
   return parts.length ? `#${parts.join('&')}` : '';
 }

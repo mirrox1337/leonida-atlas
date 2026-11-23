@@ -99,6 +99,13 @@ button { cursor: pointer; }
   color: rgb(240 246 247 / .88);
   text-shadow: 0 0 4px #000, 0 0 10px #000, 0 1px 2px #000;
 }
+/* Place labels can be clicked to fly there and highlight them. */
+.region-icon.leaflet-interactive .region { cursor: pointer; pointer-events: auto; transition: color .15s; }
+.region-icon.leaflet-interactive .region:hover { color: #fff; }
+.region.is-selected, .region-icon.leaflet-interactive .region.is-selected {
+  padding: 4px 11px; border-radius: 999px; background: var(--accent); color: var(--accent-ink);
+  text-shadow: none; box-shadow: 0 0 0 4px rgb(242 184 75 / .3), 0 3px 10px rgb(0 0 0 / .5);
+}
 .region--county { font-size: 16px; letter-spacing: .24em; }
 .region--city { font-size: 14px; }
 .region--town { font-size: 11px; letter-spacing: .12em; }
@@ -187,6 +194,7 @@ input[type="checkbox"] { width: 17px; height: 17px; margin: 0; accent-color: var
   border: 0; border-radius: 7px; background: none; text-align: left;
 }
 .result:hover, .result:focus-visible { background: var(--surface-2); }
+.result--place .result__dot { background: none; border: 2px solid var(--accent); border-radius: 2px; transform: rotate(45deg); }
 .result__dot { width: 10px; height: 10px; border-radius: 50%; background: var(--c); flex: none; }
 .result__text { display: grid; min-width: 0; }
 .result__title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

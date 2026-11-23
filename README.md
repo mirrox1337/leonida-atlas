@@ -265,6 +265,10 @@ optional and sets the size and when the label appears:
 | `area`   | districts, islands, keys, parks | from 2.75 zoom levels before `focusZoom` |
 | `water`  | bays, sounds, the ocean | from 2.75 zoom levels before `focusZoom` |
 
+Labels are selectable: clicking one flies to that place and highlights it,
+places show up first in the search results, and the link then carries
+`#r=<id>` (for example `#r=vice-city`) so a place can be shared.
+
 A label that would overlap a more important one (earlier in the table) is
 hidden until you zoom in far enough for both to fit. The zoom rules live in
 `LABEL_KINDS` in `js/main.js`; the sizes are the `.region--*` rules in

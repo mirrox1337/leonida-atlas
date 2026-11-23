@@ -4,6 +4,7 @@ import { iconSvg } from './icons.js';
 import { el, confirmButton, mobileQuery } from './util.js';
 
 const MAX_RESULTS = 40;
+const PLACE_KINDS = { county: 'County', city: 'City', region: 'Region', town: 'Town', area: 'Area', water: 'Water' };
 
 export function initSidebar(app) {
   const panel = document.getElementById('panel');
@@ -140,6 +141,20 @@ export function initSidebar(app) {
     }
     const matches = app.markers.filter((marker) => app.matchesQuery(marker.id, query));
     results.hidden = false;
+    // Places (the map's text labels) come first; picking one flies there.
+    const tokens = query.split(/\s+/);
+    const places = app.regionLabels
+      .filter((region) => tokens.every((token) => region.name.toLowerCase().includes(token)))
+      .slice(0, 6);
+    if (places.length) results.append(el('li', { class: 'results__note' }, 'Places'));
+    for (const region of places) {
+      results.append(el('li', {},
+        el('button', { type: 'button', class: 'result result--place', onclick: () => pickPlace(region.id) },
+          el('span', { class: 'result__dot' }),
+          el('span', { class: 'result__text' },
+            el('span', { class: 'result__title', text: region.name }),
+            el('span', { class: 'result__sub', text: PLACE_KINDS[region.kind] || 'Place' })))));
+    }
     results.append(el('li', { class: 'results__note' },
       matches.length
         ? `${matches.length} match${matches.length === 1 ? '' : 'es'} · map shows matches only`
@@ -156,6 +171,14 @@ export function initSidebar(app) {
     if (matches.length > MAX_RESULTS) {
       results.append(el('li', { class: 'results__note' }, `…and ${matches.length - MAX_RESULTS} more. Keep typing to narrow it down.`));
     }
+  }
+
+  function pickPlace(id) {
+    if (mobileQuery.matches) {
+      setDrawer(false);
+      input.blur();
+    }
+    app.selectRegion(id);
   }
 
   function pick(id) {
@@ -205,5 +228,11 @@ export function initSidebar(app) {
   });
 
   update();
-  return { update };
+  return {
+    update,
+    setRegions(value) {
+      showRegions.checked = value;
+      app.setShowRegions(value);
+    },
+  };
 }

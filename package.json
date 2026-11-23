@@ -1,0 +1,12 @@
+{
+  "name": "leonida-atlas",
+  "private": true,
+  "type": "module",
+  "description": "Unofficial fan-made interactive map. The site is static; Node is only needed for the optional tile script.",
+  "scripts": {
+    "tiles": "node scripts/make-tiles.js"
+  },
+  "devDependencies": {
+    "sharp": "^0.33.5"
+  }
+}

@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Leonida Atlas · unofficial GTA 6 fan map</title>
+  <meta name="description" content="Unofficial, fan-made interactive map of Leonida with filterable markers, search and progress tracking.">
+  <meta name="theme-color" content="#0c1418">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Leonida Atlas · unofficial GTA 6 fan map">
+  <meta property="og:description" content="Fan-made interactive map of Leonida: stunt jumps, collectibles, shops, ATMs and places, with search and progress tracking.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/icons/icon-180.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="vendor/leaflet.markercluster/MarkerCluster.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="map" aria-label="Interactive map of Leonida"></div>
+
+  <aside id="panel" class="panel" aria-label="Map filters">
+    <button id="drawer-toggle" class="panel__handle" type="button" aria-expanded="false" aria-controls="panel-body">
+      <span class="panel__grip" aria-hidden="true"></span>
+      <span class="sr-only">Show or hide filters</span>
+    </button>
+
+    <header class="panel__head">
+      <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3 20 16 16 29 12 16z" fill="#f2b84b"/><path d="M3 16 16 13 29 16 16 19z" fill="#3fd0c0"/></svg>
+      <div>
+        <h1 class="brand__name">Leonida Atlas</h1>
+        <p class="brand__tag">Unofficial fan map</p>
+      </div>
+    </header>
+
+    <div class="search">
+      <input id="search" type="text" inputmode="search" enterkeyhint="search" placeholder="Search markers" autocomplete="off" spellcheck="false" aria-label="Search markers" aria-controls="results">
+      <button id="search-clear" class="search__clear" type="button" aria-label="Clear search" hidden>×</button>
+    </div>
+    <ul id="results" class="results" hidden></ul>
+
+    <div id="panel-body" class="panel__body">
+      <section class="progress" aria-label="Progress">
+        <div class="progress__row">
+          <span id="progress-text">0 / 0 found</span>
+          <span class="progress__actions">
+            <button id="show-all" class="link" type="button">show all</button>
+            <button id="hide-all" class="link" type="button">hide all</button>
+          </span>
+        </div>
+        <div class="progress__track"><div id="progress-bar" class="progress__bar"></div></div>
+      </section>
+
+      <div id="cat-list"></div>
+
+      <section class="options" aria-label="Options">
+        <label class="option"><input id="hide-found" type="checkbox"> Hide found markers</label>
+        <label class="option"><input id="show-regions" type="checkbox" checked> Region labels</label>
+        <button id="reset-found" class="btn btn--sm btn--danger" type="button">Reset progress</button>
+        <p id="storage-note" class="note" hidden>This browser is blocking storage, so progress will not survive a reload.</p>
+      </section>
+
+      <section class="credits" aria-label="Credits">
+        <h2 class="credits__title">Data and map credits</h2>
+        <p class="note">Map: <a href="https://map.gtadb.org" target="_blank" rel="noopener noreferrer">GTA VI Map Tiles, GTADB.ORG</a> (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>), tiles copied unchanged.</p>
+        <p class="note">Markers: <a href="https://gta.fandom.com/wiki/Map:GTA_VI_Places_of_Interest" target="_blank" rel="noopener noreferrer">GTA Wiki</a> (<a href="https://www.fandom.com/licensing" target="_blank" rel="noopener noreferrer">CC BY-SA</a>) and <a href="https://map.gtadb.org" target="_blank" rel="noopener noreferrer">GTA VI Landmarks Data, GTADB.ORG</a> (CC BY 4.0), converted to this map's coordinates and regrouped.</p>
+      </section>
+
+      <section id="edit-panel" class="edit" aria-label="Edit mode" hidden>
+        <h2 class="edit__title">Edit mode <span id="draft-count" class="edit__count">0 drafts</span></h2>
+        <p class="note">Click the map to drop a draft marker. Drag drafts to move them. Download the file and commit it as <code>data/markers.json</code>.</p>
+        <button id="download-markers" class="btn btn--accent" type="button">Download markers.json</button>
+        <button id="discard-drafts" class="btn btn--sm btn--danger" type="button">Discard drafts</button>
+      </section>
+    </div>
+  </aside>
+
+  <div id="coords" class="coords" hidden>x · y</div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <footer class="disclaimer">
+    Unofficial fan project. Not affiliated with Rockstar Games or Take-Two Interactive.
+  </footer>
+
+  <noscript><p class="fatal">This map needs JavaScript.</p></noscript>
+
+  <script src="vendor/leaflet/leaflet.js"></script>
+  <script src="vendor/leaflet.markercluster/leaflet.markercluster.js"></script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
